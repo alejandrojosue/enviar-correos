@@ -19,6 +19,8 @@ export default class Server {
 
   this.app.use((req, res, next) => {
    console.log('Origin:', req.headers.origin)
+   console.log('IP:', req.ip)
+   
    next()
   })
 
