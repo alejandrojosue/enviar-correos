@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Menú Principal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    .menu a {
+      display: block;
+      padding: 15px;
+      text-decoration: none;
+      background-color: #1976d2;
+      color: white;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+
+    .menu a:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 Menú Principal</h1>
+
+  <div class="menu">
+    <a href="/smtp.html">📧 Gestión de SMTP</a>
+    <a href="/admin.html">📨 Historial de Correos</a>
+  </div>
+</body>
+</html>

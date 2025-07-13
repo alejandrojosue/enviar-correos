@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SMTP - Crear o Editar</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    h1 { margin-bottom: 20px; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    input[type="text"], input[type="number"], input[type="password"], input[type="email"], select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 16px;
+      background: #007bff;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .status {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <a href="/smtp.html">Regresar</a>
+  <h1 id="form-title">Crear Credencial SMTP </h1>
+
+  <form id="smtp-form">
+    <label>SMTP Host</label>
+    <input type="text" name="smtp_host" value="smtp.gmail.com" required>
+
+    <label>SMTP Port</label>
+    <input type="number" name="smtp_port" value="587" required>
+
+    <label>SMTP User</label>
+    <input type="email" name="smtp_user" required>
+
+    <label>SMTP Pass</label>
+    <input type="text" name="smtp_pass" required>
+
+    <label>Secure</label>
+    <select name="secure">
+      <option value="0">No</option>
+      <option value="1">Sí</option>
+    </select>
+
+    <label>From Name (opcional)</label>
+    <input type="text" name="from_name">
+
+    <label>From Email</label>
+    <input type="email" name="from_email" required>
+
+    <label>Usuario del sistema (para autorizar)</label>
+    <input type="text" name="username" required>
+
+    <label>Contraseña</label>
+    <input type="password" name="password" required>
+
+    <button type="submit">Guardar</button>
+    <div class="status" id="status"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('smtp-form')
+    const statusDiv = document.getElementById('status')
+    const urlParams = new URLSearchParams(window.location.search)
+    const editUser = urlParams.get('edit')
+
+    if (editUser) {
+      document.getElementById('form-title').textContent = 'Editar Credencial SMTP'
+      fetch(`/smtp/${editUser}`)
+        .then(res => {
+          if (!res.ok) throw new Error('No encontrado')
+          return res.json()
+        })
+        .then(data => {
+          for (let key in data) {
+            const input = form.elements[key]
+            if (input) input.value = data[key]
+          }
+        })
+        .catch(err => {
+          statusDiv.textContent = 'Error cargando datos: ' + err.message
+        })
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const formData = new FormData(form)
+      const payload = {
+        smtp_host: formData.get('smtp_host'),
+        smtp_port: parseInt(formData.get('smtp_port')),
+        smtp_user: formData.get('smtp_user'),
+        smtp_pass: formData.get('smtp_pass'),
+        secure: formData.get('secure') === '1',
+        from_name: formData.get('from_name'),
+        from_email: formData.get('from_email'),
+        user: {
+          username: formData.get('username'),
+          password: formData.get('password'),
+        }
+      }
+
+      try {
+        const res = await fetch('/smtp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const result = await res.json()
+        if (res.ok) {
+          statusDiv.textContent = '✅ Credenciales guardadas correctamente'
+          form.reset()
+        } else {
+          statusDiv.textContent = '❌ ' + (result.error || 'Error desconocido')
+        }
+      } catch (err) {
+        statusDiv.textContent = '❌ Error enviando datos'
+      }
+    })
+  </script>
+</body>
+</html>
